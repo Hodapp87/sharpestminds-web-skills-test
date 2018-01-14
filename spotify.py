@@ -7,6 +7,7 @@
 ###########################################################################
 
 import scrape
+import spotipy
 
 def generate_playlist(songs):
     """Given a list of songs, creates a Spotify playlist which contains

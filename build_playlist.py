@@ -7,6 +7,7 @@
 ###########################################################################
 
 import spotify
+import spotipy
 
 def create_playlist(artist):
     """Create a Spotify playlist containing the latest songs by the given
