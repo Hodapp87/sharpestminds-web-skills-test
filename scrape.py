@@ -77,8 +77,9 @@ def find_songs(artist, base_url="https://api.setlist.fm/rest/1.0"):
     resp = requests.get(setlist_url, headers=headers)
     if resp.status_code != requests.codes.ok:
         raise SetListHTTPException(resp.status_code)
-    # TODO: Do results come back newest-first?
     setlists = resp.json()["setlist"]
+    # The responses appear to come back newest-first, but nothing in
+    # the documentation says this.
     setlist = []
     # Search through all the setlists for the first one with at least
     # one set with at least one song.

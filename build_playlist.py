@@ -6,8 +6,8 @@
 # Date: 2018-01-12
 ###########################################################################
 
+import scrape
 import spotify
-import spotipy
 
 def create_playlist(artist):
     """Create a Spotify playlist containing the latest songs by the given
