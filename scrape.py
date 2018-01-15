@@ -26,8 +26,9 @@ class SetListHTTPException(Exception):
     def __str__(self):
         return "HTTP status {}".format(self.status)
 
-BASE_URL = "https://api.setlist.fm/rest/1.0"
-
+class SetListNotFoundException(Exception):
+    pass
+    
 # Request headers sent with every API call:
 headers = {
     # API key is hard-coded (bad practice, but it's allowed in the
@@ -41,12 +42,14 @@ def json_pprint(j):
     """Utility-function to pretty-print a parsed JSON tree."""
     print(json.dumps(j, indent=4, sort_keys=True))
 
-def find_songs(artist):
+def find_songs(artist, base_url="https://api.setlist.fm/rest/1.0"):
     """Obtains the songs from a musical artist's latest set-list.  This
     scrapes http://www.setlist.fm in order to get this data.
 
     Parameters:
     artist -- String with the musician or band's name
+    base_url -- Optional string with URL prefix for setlist.fm API
+                (default: https://api.setlist.fm/rest/1.0)
 
     Returns:
     songs -- A list of song names (as strings)
@@ -58,28 +61,36 @@ def find_songs(artist):
         "artistName": artist,
         "sort": "relevance"
     }
-    artist_url = BASE_URL + "/search/artists"
+    artist_url = base_url + "/search/artists"
     resp = requests.get(artist_url, params, headers=headers)
     if resp.status_code != requests.codes.ok:
         raise SetListHTTPException(resp.status_code)
-    # TODO: Check for non-zero list
-    artist_dict = resp.json()["artist"][0]
-    mbid = artist_dict["mbid"]
-    # TODO: Make sure MBID looks like a GUID (we're inserting it into
-    # a URL)
-    name = artist_dict["name"]
-    print("Found MusicBrainz ID {} for artist \"{}\"".format(mbid, name))
+    artists = resp.json()["artist"]
+    if len(artists) == 0:
+        raise SetListNotFoundException()
+    mbid = artists[0]["mbid"]
+    name = artists[0]["name"]
+    print("Best match: artist \"{}\", MusicBrainz ID {}".format(name, mbid))
     
     # Then, query for the latest setlist:
-    setlist_url = BASE_URL + "/artist/" + mbid + "/setlists"
+    setlist_url = base_url + "/artist/" + mbid + "/setlists"
     resp = requests.get(setlist_url, headers=headers)
     if resp.status_code != requests.codes.ok:
         raise SetListHTTPException(resp.status_code)
     # TODO: Do results come back newest-first?
-    # TODO: Check for non-empty set-list
-    set_ = resp.json()["setlist"][0]
-    json_pprint(set_)
-    songs = [d["name"] for d in set_["sets"]["set"][0]["song"]]
-    # See the artist Pavement for an example where "set" has multiple
-    # elements (in this case, for their encore)
+    setlists = resp.json()["setlist"]
+    setlist = []
+    # Search through all the setlists for the first one with at least
+    # one set with at least one song.
+    for setlist in setlists:
+        songs = []
+        # Sets may contain multiple parts (encores seem to be shown
+        # this way), but are still the same set, so append them all:
+        for group in setlist["sets"]["set"]:
+            songs += [d["name"] for d in group["song"]]
+        # Take the first non-empty setlist we've found:
+        if songs:
+            break
+    if not songs:
+        return SetListNotFoundException()
     return songs
