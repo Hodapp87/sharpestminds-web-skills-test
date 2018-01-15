@@ -12,7 +12,6 @@ import spotipy.util
 import datetime
 
 SPOTIFY_USERNAME = "hodapp"
-
 token = spotipy.util.prompt_for_user_token(
     SPOTIFY_USERNAME,
     "playlist-modify-public",

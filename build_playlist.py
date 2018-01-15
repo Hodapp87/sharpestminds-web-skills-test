@@ -6,6 +6,8 @@
 # Date: 2018-01-12
 ###########################################################################
 
+import sys
+
 import scrape
 import spotify
 
@@ -16,4 +18,6 @@ def create_playlist(artist):
     Parameters:
     artist -- String containing a musician or band name
     """
-    pass
+    songs = scrape.find_songs(artist)
+    url = spotify.generate_playlist(songs)
+    print(url)
