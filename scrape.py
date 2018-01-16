@@ -8,10 +8,10 @@
 
 import json
 import requests
-#import bs4
 
 class SetListHTTPException(Exception):
-    """Custom exception class for an HTTP status that is not 200 (OK).
+    """Custom exception class for an HTTP status that is not 200 (OK)
+    when accessing setlist.fm's API.
     """
     def __init__(self, status, *args, **kwargs):
         """Create a SetListHTTPException.  All other arguments besides
@@ -27,6 +27,9 @@ class SetListHTTPException(Exception):
         return "HTTP status {}".format(self.status)
 
 class SetListNotFoundException(Exception):
+    """Custom exception class indicating that no setlists could be found
+    for some search given.
+    """
     pass
     
 def json_pprint(j):
@@ -38,6 +41,10 @@ def find_songs(artist, base_url="https://api.setlist.fm/rest/1.0",
     """Obtains the songs from a musical artist's latest set-list.  This
     scrapes http://www.setlist.fm in order to get this data.
 
+    May throw SetListHTTPException or SetListNotFoundException in the
+    event of access being denied or a search being unable to find an
+    artist.
+
     Parameters:
     artist -- String with the musician or band's name
     base_url -- Optional string with URL prefix for setlist.fm API
@@ -46,6 +53,7 @@ def find_songs(artist, base_url="https://api.setlist.fm/rest/1.0",
 
     Returns:
     songs -- A list of song names (as strings)
+
     """
     # Sent with every request to force JSON and to pass API key:
     headers = { "x-api-key": api_key, "Accept": "application/json" }
@@ -86,5 +94,5 @@ def find_songs(artist, base_url="https://api.setlist.fm/rest/1.0",
         if songs:
             break
     if not songs:
-        return SetListNotFoundException()
+        raise SetListNotFoundException()
     return songs

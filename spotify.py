@@ -17,7 +17,7 @@ token = spotipy.util.prompt_for_user_token(
     "playlist-modify-public",
     client_id = "caaa12900a34490dbba42487f4f37923",
     client_secret = "ada72b869ccf4cf4afb16560d95c956c",
-    redirect_uri = "http://localhost:8888/callback?code=AQCm02r9a0N_7CV02FmQRnTKH-5ICNg9lZBsbBuEIuPu03Tg4Neu0U97HrtzJNkJzQIGY-_k4wf3OmpuSf1KbouSKr0L_bhTiZawIRUTDr-wLuKaPcFRvZTOW_LWy69mddIi2XM3mNjLp-39kJSm6i1fZXOFj2U908r5IfmKOelhb8Zp0xRFe6qyeThPcub-7RXnV7qSVQkOU4sZ1inLwqgoKP4VfchZS_Y_Kg")
+    redirect_uri = "http://localhost:8888/callback")
 
 def generate_playlist(songs):
     """Given a list of songs, creates a Spotify playlist which contains
@@ -45,7 +45,7 @@ def generate_playlist(songs):
     dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     playlist_name = "SharpestMinds test " + dt
     r = sp.user_playlist_create(SPOTIFY_USERNAME, playlist_name)
-    print('Created playlist \"{}\"'.format(playlist_name))
+    print('Created playlist: \"{}\"'.format(playlist_name))
     playlist_id = r["id"]
     playlist_url = r["external_urls"]["spotify"]
     
