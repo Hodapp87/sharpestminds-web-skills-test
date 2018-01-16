@@ -39,10 +39,11 @@ def generate_playlist(songs):
         if tracks:
             song_ids.append(tracks[0]["id"])
         else:
-            print('Skipping song "{}" because no match found'.format(song))
-
+            print('Skipped "{}" because no Spotify match was found'.format(song))
+ 
     # Create a new playlist and get its URL and ID:
     dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # Playlist name has date/time at the end to keep it unique
     playlist_name = "SharpestMinds test " + dt
     r = sp.user_playlist_create(SPOTIFY_USERNAME, playlist_name)
     print('Created playlist: \"{}\"'.format(playlist_name))
